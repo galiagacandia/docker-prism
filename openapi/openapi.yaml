@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: Gestión Usuarios (msa-gestionusuarios)
+  description: API para la gestión de usuarios.
+  contact:
+    name: Registro Único para la Administración Tributaria Municipal
+    url: https://www.ruat.gob.bo/
+    email: rgorena@ruat.gob.bo
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+  - url: http://localhost:8080
+    description: Servidor de Desarrollo
+  - url: http://localhost:8080
+    description: Servidor de Calidad
+paths:
+  /gestion-usuarios/autorizacion/subsistemas/{subsistemaId}/aplicaciones/{aplicacionId}/cabeceras:
+    get:
+      tags:
+        - Cabecera
+      operationId: obtenerDatosCabecera
+      description: Retorna la cabecera para un usuario
+      summary: Retorna cabecera por cuentaUsuario
+      parameters:
+        - name: subsistemaId
+          in: path
+          description: Código de subsistema
+          required: true
+          schema:
+            type: string
+          example: VEH
+        - name: aplicacionId
+          in: path
+          description: Código de aplicación debe estar entre 1 y 99
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 2
+        - name: usuario
+          in: query
+          description: Cuenta de usuario
+          required: true
+          schema:
+            type: string
+          example: ADMELAIME.CBA
+      responses:
+        200:
+          description: Datos de la cabecera
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObtenerDatosCabeceraResponse'
+              #example:
+
+        500:
+          description: Se ha producido un error interno en el servidor. Consulte a
+            soporte de datos con el código traceID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExcepcionMensaje'
+  /gestion-usuarios/ambientes/{ambiente}/actual:
+    get:
+      tags:
+        - Cabecera
+      operationId: obtenerAmbiente
+      description: Verifica si el ambiente en el que se ejecuta la aplicación es el actual
+      summary: Verifica si el ambiente enviado como parámetro es el actual
+      parameters:
+        - name: ambiente
+          in: path
+          description: Nombre de ambiente
+          required: true
+          schema:
+            type: string
+          example: produccion
+      responses:
+        200:
+          description: Ambiente de la aplicación
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: false
+        500:
+          description: Se ha producido un error interno en el servidor. Consulte a
+            soporte de datos con el código traceID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExcepcionMensaje'
+components:
+  schemas:
+    ObtenerDatosCabeceraResponse:
+      type: object
+      properties:
+        datosCabecera:
+          $ref: '#/components/schemas/DatosCabecera'
+    DatosCabecera:
+      type: object
+      properties:
+        nsecUsuario:
+          type: integer
+          format: int64
+          description: Número de secuencia de usuario
+          example: 1011130054554
+        nombreCompleto:
+          type: string
+          description: Número completo del usuario
+          example: EDDY LAIME
+        fechaActual:
+          type: string
+          description: Fecha del sistema en formato literal
+          example: 27 de junio de 2022
+        codEntidad:
+          type: string
+          description: Código de Entidad
+          example: "30010"
+        denominacionEntidad:
+          type: string
+          description: Denominación de Entidad
+          example: GOBIERNO AUTONOMO MUNICIPAL DE COCHABAMBA
+        versionAplicacion:
+          type: string
+          description: Versión de la Aplicación
+          example: "1"
+    ExcepcionMensaje:
+      description: Mensaje de excepción
+      type: object
+      properties:
+        traceID:
+          description: Identificador de la traza de la petición
+          type: string
+        mensajes:
+          description: Lista de mensajes que ocasionaron la excepción
+          type: array
+          items:
+            type: string
